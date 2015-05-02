@@ -37,6 +37,18 @@ or add
 
 to the require section of your `composer.json` file.
 
+Optional
+-----------
+The next step is just for initial development, skip it if you directly publish the extension on packagist.org
+Add the newly created repo to your composer.json.
+
+"repositories":[
+    {
+        "type": "git",
+        "url": "https://github.com/ramshresh/yii2-gallery-manager.git"
+    }
+]
+
 
 Usage
 -----
