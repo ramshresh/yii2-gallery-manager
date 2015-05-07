@@ -391,8 +391,8 @@ class GalleryBehavior extends Behavior
         $galleryImageAr = new GalleryImageAr();
         $galleryImageAr->setGalleryBehavior($this);
         $galleryImageAr->setAttributes([
-            'type' => $this->type,
-            'ownerId' => $this->getGalleryId()
+            'type' => (string)$this->type,
+            'ownerId' => (string)$this->getGalleryId()
         ]);
         if($data){
             $galleryImageAr->setAttributes($data);
