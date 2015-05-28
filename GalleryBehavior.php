@@ -12,6 +12,7 @@ use yii\db\Query;
 use yii\helpers\Json;
 use yii\helpers\Url;
 use yii\imagine\Image;
+use yii\web\UploadedFile;
 use yii\web\YiiAsset;
 
 /**
@@ -386,13 +387,26 @@ class GalleryBehavior extends Behavior
         return $galleryImage;
     }
 
+    public function addUploadedImage($uploadName,$data){
+        if(!$uploadName){
+            throw new Exception('upLoadName must be specified for file');
+        }
+        $imageFile = UploadedFile::getInstanceByName($uploadName);
+        $fileName = $imageFile->tempName;
+        try{
+            $image = $this->addImage($fileName,$data);
+        }catch (Exception $e){
+            throw $e;
+        }
+    }
+
     public function addImage($fileName,$data=null)
     {
         $galleryImageAr = new GalleryImageAr();
         $galleryImageAr->setGalleryBehavior($this);
         $galleryImageAr->setAttributes([
-            'type' => (string)$this->type,
-            'ownerId' => (string)$this->getGalleryId()
+            'type' => $this->type,
+            'ownerId' => $this->getGalleryId()
         ]);
         if($data){
             $galleryImageAr->setAttributes($data);
@@ -403,13 +417,17 @@ class GalleryBehavior extends Behavior
             $savingImage = \Yii::$app->db->beginTransaction();
             $galleryImageAr->save();
             $galleryImageAr->rank = $galleryImageAr->id;
-            $galleryImageAr->save();
-            $this->replaceImage($galleryImageAr->id, $fileName);
-            $this->removeFile($fileName);
-            $savingImage->commit();
+            if($galleryImageAr->save()){
+                $this->replaceImage($galleryImageAr->id, $fileName);
+                $this->removeFile($fileName);
+                $savingImage->commit();
+            }else{
+                throw new Exception(Json::encode($galleryImageAr->errors));
+            }
+
         }catch (Exception $e){
             $savingImage->rollBack();
-           throw $e;
+            throw $e;
         }
         /*$db->createCommand()
             ->update(
@@ -419,8 +437,8 @@ class GalleryBehavior extends Behavior
             )->execute();*/
         //$this->replaceImage($id, $fileName);
 
-       // $galleryImage = new GalleryImage($this, ['id' => $id]);
-       // $galleryImageAr = new GalleryImageAr($this, ['id' => $id]);
+        // $galleryImage = new GalleryImage($this, ['id' => $id]);
+        // $galleryImageAr = new GalleryImageAr($this, ['id' => $id]);
 
         if ($this->_images !== null) {
             //$this->_images[] = $galleryImage;
