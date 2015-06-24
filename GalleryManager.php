@@ -57,8 +57,7 @@ class GalleryManager extends Widget
         if ($this->apiRoute === null) {
             throw new Exception('$apiRoute must be set.', 500);
         }
-
-        $images = array();
+        $images=[];
         foreach ($this->behavior->getImages() as $image) {
             $images[] = array(
                 'id' => $image->id,
