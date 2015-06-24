@@ -1,1 +1,5 @@
 /.sass-cache
+
+composer.lock
+.idea
+.idea/misc.xml
